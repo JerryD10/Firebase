@@ -1,0 +1,246 @@
+<html>
+<head>
+  <title>Login</title>
+  <link rel="stylesheet" type="text/css" href="bower_components/semantic/dist/semantic.min.css">
+  <script src="https://www.gstatic.com/firebasejs/3.8.0/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyCA2vafJnG6jkQBHId5ygBCvWGaFqhglDQ",
+    authDomain: "npltest-aef23.firebaseapp.com",
+    databaseURL: "https://npltest-aef23.firebaseio.com",
+    projectId: "npltest-aef23",
+    storageBucket: "npltest-aef23.appspot.com",
+    messagingSenderId: "475823687563"
+  };
+  firebase.initializeApp(config);
+</script>
+  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <!--<script src="./bower_components/semantic/dist/semantic.min.js"></script>-->
+    <script src="bower_components/semantic/dist/semantic.min.js"></script>
+    <script>
+        $(document).ready(function () {
+                    // create sidebar and attach to menu open
+                    $('.ui.sidebar').sidebar('setting', 'transition', 'overlay').sidebar('attach events', '.toc.item');
+                   $('.menu .item').tab();  
+                });
+        
+    </script>
+    <style type="text/css">
+      body {
+        background-color: black;
+      }
+    body > .grid {
+      height: 100%;
+    }
+    .image {
+      margin-top: -100px;
+    }
+    
+    </style>
+</head>
+<body>
+
+<script type="text/javascript"> 
+  var database = firebase.database();
+  var name;
+  var email;
+  var nextQuest = firebase.database().ref("SignedIn/");
+       //firebase.database().ref("Teacher/Question "+countVC+"/").once('value').then(function(snapshot) {
+        nextQuest.on('child_added',function(snapshot){
+        email=snapshot.child("Name").val();
+  $('#online').append("<tr><td>"+email+"</td></tr>");
+  }, function (error) {
+    console.log("Error: " + error.code);
+      
+    });
+        var cor = firebase.database().ref("Replies/Correct/");
+       //firebase.database().ref("Teacher/Question "+countVC+"/").once('value').then(function(snapshot) {
+        cor.on('child_added',function(snapshot){
+        var quesionNo=snapshot.child("Question").val();
+        var name=snapshot.child("Name").val();
+        var choice=snapshot.child("Answer").val();
+  $('#correct').append("<tr><td>"+quesionNo+"</td><td>"+name+"</td><td>"+choice+"</td></tr>");
+  }, function (error) {
+    console.log("Error: " + error.code);
+      
+    });
+
+
+        var cor = firebase.database().ref("Replies/Incorrect/");
+       //firebase.database().ref("Teacher/Question "+countVC+"/").once('value').then(function(snapshot) {
+        cor.on('child_added',function(snapshot){
+        var quesionNo=snapshot.child("Question").val();
+        var name=snapshot.child("Name").val();
+        var choice=snapshot.child("Answer").val();
+  $('#incorrect').append("<tr><td>"+quesionNo+"</td><td>"+name+"</td><td>"+choice+"</td></tr>");
+  }, function (error) {
+    console.log("Error: " + error.code);
+      
+    });
+         var pro = firebase.database().ref("Students/");
+       //firebase.database().ref("Teacher/Question "+countVC+"/").once('value').then(function(snapshot) {
+        pro.on('child_added',function(snapshot){
+        var correct=snapshot.child("Correct").val();
+        var name=snapshot.child("Name").val();
+        var wrong=snapshot.child("Wrong").val();
+        var per=correct/(correct+wrong);
+                  per=per*100;
+                  //alert(correct);
+
+            
+
+  $('#pro').append("<tr><td>"+name+"</td><td><div class=\"ui teal progress\" id="+name+"><div class=\"bar\"></div></div></td><td><button class=\"ui red primary button\" id="+name+" onclick=view(this.id) >View Progress</td></tr>");
+    $("#"+name).progress({
+                  percent: per
+                });
+
+  }, function (error) {
+    console.log("Error: " + error.code);
+      
+    });
+        //var pro = firebase.database().ref("Students/");
+       //firebase.database().ref("Teacher/Question "+countVC+"/").once('value').then(function(snapshot) {
+       
+
+        function view(clicked)
+         {
+          var but=document.getElementById(clicked);
+          firebase.database().ref("Students/"+clicked+"/").once('value').then(function(snapshot) {
+
+            var correct=snapshot.child("Correct").val();
+        var name=snapshot.child("Name").val();
+        var wrong=snapshot.child("Wrong").val();
+        
+        var per=correct/(correct+wrong);
+                  per=per*100;
+                  alert(per);
+            $("#"+clicked).progress({
+                  percent: per
+                });
+          });
+         }
+  firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    // User is signed in.
+  } else {
+    // No user is signed in.
+    window.location="main.html";
+  }
+});
+  
+  function signout()
+  {
+      firebase.auth().signOut().then(function() {
+  // Sign-out successful.
+}).catch(function(error) {
+  // An error happened.
+});
+  }
+</script>
+  <div class="ui fixed primary inverted menu">
+  <a class="active item">
+    Home
+  </a>
+  <a class="item">
+    Messages
+  </a>
+  <div class="right menu"><div class="ui large black submit button" onclick="signout()" id="signout">Sign Out</div></div>
+</div>                  
+<div class="ui one column inverted padded centered grid">
+                    <div class="ui centered column ">
+                        <div class="ui container">
+                                    <h1 class="ui inverted header" >Welcome</h1>
+                                    <h2 class="ui inverted header">A place you call home</h2>
+                                    <h3 class="ui inverted header">
+                                    <i class="users icon"></i>
+                                    Your Dashboard </h3>
+                                    <div class="ui divider"></div>
+                                    <div class="raised content">
+                                        This is your own home page. From here you can manage your tests.
+                                    </div>
+                                </div>
+                    </div>
+                    <div class="ui centered column">
+                      <div class="ui grid">
+                        <div class="four wide column">
+                          <div class="ui vertical fluid tabular inverted menu">
+                            <a class="item" href="dashboardTeacher.html">
+                              Upload Questions
+                            </a>
+                            <a class="item" href="statistics.html">
+                              View Statistics
+                            </a>
+                          </div>
+                        </div>
+                        <div class="twelve wide stretched column">
+                          <div class="ui inverted segment">
+                            <table class="ui celled inverted table">
+                              <thead>
+                              <tr>
+                                <th colspan="2">
+                                  Users Online
+                                </th>
+                              </tr>
+                              </thead>
+                              <tbody id="online">
+                                
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                        <div class="eight wide stretched column">
+                          <div class="ui inverted segment">
+                            <table class="ui celled inverted table">
+                              <thead>
+                              <tr>
+                                <th colspan="3">
+                                  Correct
+                                </th>
+                              </tr>
+                              </thead>
+                              <tbody id="correct">
+                                
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                         <div class="eight wide stretched column">
+                          <div class="ui inverted segment">
+                            <table class="ui celled inverted table">
+                              <thead>
+                              <tr>
+                                <th colspan="3">
+                                  Incorrect
+                                </th>
+                              </tr>
+                              </thead>
+                              <tbody id="incorrect">
+                                
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                         <div class="sixteen wide stretched column">
+                          <div class="ui inverted segment">
+                            <table class="ui celled inverted table">
+                              <thead>
+                              <tr>
+                                <th colspan="3">
+                                  Progress
+                                </th>
+                              </tr>
+                              </thead>
+                              <tbody id="pro">
+                                
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+</body>
+</html>

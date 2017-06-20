@@ -1,0 +1,172 @@
+<html>
+<head>
+  <title>Login</title>
+  <link rel="stylesheet" type="text/css" href="bower_components/semantic/dist/semantic.min.css">
+  <script src="https://www.gstatic.com/firebasejs/3.8.0/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyCA2vafJnG6jkQBHId5ygBCvWGaFqhglDQ",
+    authDomain: "npltest-aef23.firebaseapp.com",
+    databaseURL: "https://npltest-aef23.firebaseio.com",
+    projectId: "npltest-aef23",
+    storageBucket: "npltest-aef23.appspot.com",
+    messagingSenderId: "475823687563"
+  };
+  firebase.initializeApp(config);
+</script>
+  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <!--<script src="./bower_components/semantic/dist/semantic.min.js"></script>-->
+    <script src="bower_components/semantic/dist/semantic.min.js"></script>
+    <script>
+        $(document).ready(function () {
+                    // create sidebar and attach to menu open
+                    $('.ui.sidebar').sidebar('setting', 'transition', 'overlay').sidebar('attach events', '.toc.item');
+                   $('.menu .item').tab();  
+                });
+        
+    </script>
+    <style type="text/css">
+      body {
+        background-color: black;
+      }
+    body > .grid {
+      height: 100%;
+    }
+    .image {
+      margin-top: -100px;
+    }
+    
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    // User is signed in.
+      var user = firebase.auth().currentUser;
+      name = user.displayName;
+      alert(name);
+      //window.location="dashboardStudent.html";    
+      
+  } else {
+    // No user is signed in.
+    window.location="main.html";
+  }
+});
+ /// var database = firebase.database(); 
+  function submitAnswer()
+  {
+    var question=document.getElementById("question");
+    var username=document.getElementById("userName").value;
+    document.getElementById("userName").value=" ";
+
+  firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    // User is signed in.
+    //var user1 = firebase.auth().currentUser;
+    //alert(username);
+user.updateProfile({
+  displayName: username
+}).then(function() {
+  // Update successful.
+}, function(error) {
+  // An error happened.
+});
+//window.location="dashboardStudent.html";
+  } else {
+    // No user is signed in.
+    window.location="main.html";
+  }
+});
+
+  var playersRef = firebase.database().ref("Students/"+username+"/");
+    
+
+    playersRef.set({
+        
+          Name: username,
+          Correct: 0,
+          Wrong: 0,
+    });
+
+  }
+  function signout()
+  {
+      firebase.auth().signOut().then(function() {
+  // Sign-out successful.
+}).catch(function(error) {
+  // An error happened.
+});
+  }
+</script>
+  <div class="ui fixed primary inverted menu">
+  
+  <div class="right menu"><button class="ui large black submit button" onclick="signout()" id="signout">Sign Out</button></div>
+</div>                  
+<div class="ui one column inverted padded centered grid">
+                    <div class="ui centered column ">
+                        <div class="ui container">
+                                    <h1 class="ui inverted header" >Welcome</h1>
+                                    <h2 class="ui inverted header">A place you call home</h2>
+                                    <h3 class="ui inverted header">
+                                    <i class="users icon"></i>
+                                    Your Dashboard </h3>
+                                    <div class="ui divider"></div>
+                                    <div class="raised content">
+                                        This is your own home page. From here you can manage your orders.
+                                    </div>
+                                </div>
+                    </div>
+                    <div class="ui centered column">
+                      <div class="ui grid">
+                        <div class="three wide column">
+                          <div class="ui vertical fluid tabular inverted menu">
+                            <a class="item" href="dashboardStudent.html">
+                              Tests
+                            </a>
+                            <a class="item">
+                              Links
+                            </a>
+                          </div>
+                        </div>
+                        <div class="twelve wide stretched column">
+                          <div class="ui inverted segment">
+                            <table class="ui celled inverted table">
+                              <thead>
+                              <tr>
+                                <th colspan="4" class="fluid">Enter Your Name</th>
+                                
+                              </tr>
+                              <tr>
+                                  <td colspan="4">
+                                    <div class="ui large fluid icon input">
+                                    <input type="text" placeholder="User Name" id="userName">
+                                    <i class="ui input focus"></i>
+                                    </div>
+                                  </td>
+                                  </tr>
+                                  
+                              </thead>
+                              <tbody >
+                                
+                              </tbody>
+                              <tfoot>
+                                <tr>
+                                <th colspan="4">
+                                  <button class=" ui right floated secondary large button" id="submitAnswer" onclick="submitAnswer()" >Submit</button>
+                                </th>
+                                <input type="hidden" id="count" value="0" />
+                              </tr></tfoot>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+
+</body>
+</html>

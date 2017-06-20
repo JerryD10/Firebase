@@ -1,0 +1,252 @@
+<html>
+<head>
+  <title>Login</title>
+  <link rel="stylesheet" type="text/css" href="bower_components/semantic/dist/semantic.min.css">
+  <script src="https://www.gstatic.com/firebasejs/3.8.0/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyCA2vafJnG6jkQBHId5ygBCvWGaFqhglDQ",
+    authDomain: "npltest-aef23.firebaseapp.com",
+    databaseURL: "https://npltest-aef23.firebaseio.com",
+    projectId: "npltest-aef23",
+    storageBucket: "npltest-aef23.appspot.com",
+    messagingSenderId: "475823687563"
+  };
+  firebase.initializeApp(config);
+</script>
+  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <!--<script src="./bower_components/semantic/dist/semantic.min.js"></script>-->
+    <script src="bower_components/semantic/dist/semantic.min.js"></script>
+    <script>
+        $(document).ready(function () {
+                    // create sidebar and attach to menu open
+                    $('.ui.sidebar').sidebar('setting', 'transition', 'overlay').sidebar('attach events', '.toc.item');
+                   $('.menu .item').tab();  
+                });
+        
+    </script>
+    <style type="text/css">
+      body {
+        background-color: black;
+      }
+    body > .grid {
+      height: 100%;
+    }
+    .image {
+      margin-top: -100px;
+    }
+    
+    </style>
+</head>
+<body>
+
+<script type="text/javascript"> 
+  var database = firebase.database(); 
+  function endQuiz()
+  {
+    var playersRef = firebase.database().ref("End/Quiz/");
+    playersRef.set({
+        
+          Quiz : "True",
+    });
+  }
+  function nextQuestion()
+  {
+    var nextQuestion = firebase.database().ref("Question");
+    nextQuestion.on('value',function(snapshot){
+      console.log(snapshot.val());
+    });
+    //var nextQuestion=document.getElementById("nextQuestion");
+    nextQuestion.innerText="Next Question";
+      var submitAnswer=document.getElementById("submitAnswer");
+      submitAnswer.disabled=false;
+      
+      var question=document.getElementById("question"); 
+      //question.innerText="Hello";
+      //.child('Teacher').child('Jack').child('Question 1');
+      //.child("Teacher").child("Jack").child("Question 1");
+      //firebaseRef.on('value', function (datasnapshot){
+      
+      //question.innerText="<tr> <td>" + datasnapshot.child("Question").val() + "</td></tr>";  
+      //question.innerText=datasnapshot.child('Students').child('Jeremiah').child('Email').val();  
+      //});
+  }
+  
+  function submitAnswer()
+  {
+    var question=document.getElementById("Question").value;
+    var option1=document.getElementById("Option1").value;
+    var option2=document.getElementById("Option2").value;  
+    var option3=document.getElementById("Option3").value;
+    var option4=document.getElementById("Option4").value;
+    var coption=document.getElementById("COption").value;
+    var questionNum=document.getElementById("QuestionNumber").value;
+
+    var playersRef = firebase.database().ref("Teacher/Question "+questionNum+"/");
+    
+
+    playersRef.set({
+        
+          Question : question,
+          Option1 : option1,
+          Option2 : option2,
+          Option3 : option3,
+          Option4 : option4,
+          CorrectOption : coption,
+    });
+
+    //countV++;
+    var playersRef = firebase.database().ref("Teacher/TotalQuestions/");
+    playersRef.set({
+       Number : questionNum
+    });
+
+    document.getElementById("Question").value=" ";
+    document.getElementById("Option1").value=" ";
+    document.getElementById("Option2").value=" ";
+    document.getElementById("Option3").value=" ";
+    document.getElementById("Option4").value=" ";
+    document.getElementById("COption").value=" ";
+    document.getElementById("QuestionNumber").value=" ";
+
+
+  }
+
+  firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    // User is signed in.
+  } else {
+    // No user is signed in.
+    window.location="main.html";
+  }
+});
+  
+  function signout()
+  {
+      firebase.auth().signOut().then(function() {
+  // Sign-out successful.
+}).catch(function(error) {
+  // An error happened.
+});
+  }
+</script>
+  <div class="ui fixed primary inverted menu">
+  <a class="active item">
+    Home
+  </a>
+  <a class="item">
+    Messages
+  </a>
+  <div class="right menu"><div class="ui large black submit button" onclick="signout()" id="signout">Sign Out</div></div>
+</div>                  
+<div class="ui one column inverted padded centered grid">
+                    <div class="ui centered column ">
+                        <div class="ui container">
+                                    <h1 class="ui inverted header" >Welcome</h1>
+                                    <h2 class="ui inverted header">A place you call home</h2>
+                                    <h3 class="ui inverted header">
+                                    <i class="users icon"></i>
+                                    Your Dashboard </h3>
+                                    <div class="ui divider"></div>
+                                    <div class="raised content">
+                                        This is your own home page. From here you can manage your tests.
+                                    </div>
+                                </div>
+                    </div>
+                    <div class="ui centered column">
+                      <div class="ui grid">
+                        <div class="four wide column">
+                          <div class="ui vertical fluid tabular inverted menu">
+                            <a class="item" href="dashboardTeacher.html">
+                              Upload Questions
+                            </a>
+                            <a class="item" href="statistics.html">
+                              View Statistics
+                            </a>
+                          </div>
+                        </div>
+                        <div class="twelve wide stretched column">
+                          <div class="ui inverted segment">
+                            <table class="ui celled inverted table">
+                              <thead>
+                              <tr>
+                                <th colspan="2">
+                                  Question Number
+                                </th>
+                                <th colspan="3">
+                                  <div class="ui large fluid icon input">
+                                    <input type="text" placeholder="Question Number" id="QuestionNumber">
+                                    <i class="ui input focus"></i>
+                                    </div>
+                                </th>
+                              </tr>
+                              <tr>
+                                <th colspan="1" class="fluid">Question</th>
+                                <th colspan="4">
+                                    <div class="ui large fluid icon input">
+                                    <input type="text" placeholder="Question" id="Question">
+                                    <i class="ui input focus"></i>
+                                    </div>
+                                  </th>
+                              </tr>
+                              
+                                  <tr>
+                                <th>Option 1</th>
+                                <th>Option 2</th>
+                                <th>Option 3</th>
+                                <th>Option 4</th>
+                              </tr>
+                              </thead>
+                              <tbody >
+                              
+                                  <tr>
+                                <td><div class="ui input focus">
+                                    <input type="text" placeholder="Option 1" id="Option1">
+                                    </div>
+                                </td>
+                                <td><div class="ui input focus">
+                                    <input type="text" placeholder="Option 2" id="Option2">
+                                    </div>
+                                </td>
+                                <td><div class="ui input focus">
+                                    <input type="text" placeholder="Option 3" id="Option3">
+                                    </div>
+                                </td>
+                                <td><div class="ui input focus">
+                                    <input type="text" placeholder="Option 4" id="Option4">
+                                    </div>
+                                </td>
+
+                              </tr>
+                              
+                              <tr>
+                              <th colspan="5"> Correct Answer </th>
+                              </tr>
+                              <tbody>
+                                
+                                  <td><div class="ui input focus">
+                                    <input type="text" placeholder="Correct Option" id="COption">
+                                    </div>
+                                  </td>
+
+                              </tbody>
+                              </tbody>
+                              <tfoot>
+                                <tr>
+                                <th colspan="5">
+                                  <button class=" ui right floated large button" id="submitAnswer" onclick="submitAnswer()">Submit</button>
+                                  <button class=" ui right floated large button" id="submitAnswer" onclick="endQuiz()">End</button>
+                                  <input type="hidden" id="count" value="0" />
+                                </th>
+                              </tr></tfoot>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+</body>
+</html>

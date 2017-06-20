@@ -1,0 +1,300 @@
+<html>
+<head>
+  <title>Login</title>
+  <link rel="stylesheet" type="text/css" href="bower_components/semantic/dist/semantic.min.css">
+  <script src="https://www.gstatic.com/firebasejs/3.8.0/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyCA2vafJnG6jkQBHId5ygBCvWGaFqhglDQ",
+    authDomain: "npltest-aef23.firebaseapp.com",
+    databaseURL: "https://npltest-aef23.firebaseio.com",
+    projectId: "npltest-aef23",
+    storageBucket: "npltest-aef23.appspot.com",
+    messagingSenderId: "475823687563"
+  };
+  firebase.initializeApp(config);
+</script>
+  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <!--<script src="./bower_components/semantic/dist/semantic.min.js"></script>-->
+    <script src="bower_components/semantic/dist/semantic.min.js"></script>
+    <script>
+        $(document).ready(function () {
+                    // create sidebar and attach to menu open
+                    $('.ui.sidebar').sidebar('setting', 'transition', 'overlay').sidebar('attach events', '.toc.item');
+                   $('.menu .item').tab();  
+                });
+        
+    </script>
+    <style type="text/css">
+      body {
+        background-color: black;
+      }
+    body > .grid {
+      height: 100%;
+    }
+    .image {
+      margin-top: -100px;
+    }
+    
+    </style>
+</head>
+
+
+<script type="text/javascript">
+var countVC=1;
+  var name;
+   var email;
+  var uid;
+  firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    // User is signed in.
+    
+    var user = firebase.auth().currentUser;
+    name = user.displayName;
+    email=user.email;
+    uid = user.uid;
+    var playersRef = firebase.database().ref("SignedIn/"+name);
+    playersRef.set({
+        
+          Name: email
+    });
+    var ansPut = firebase.database().ref("Students/"+name+"/");
+            ansPut.set({
+            Name: name,
+            Correct : 0,
+            Wrong : 0,
+        });
+
+
+  } else {
+    // No user is signed in.
+    window.location="main.html";
+  }
+});
+  var endQuiz = firebase.database().ref("End/");
+       //firebase.database().ref("Teacher/Question "+countVC+"/").once('value').then(function(snapshot) {
+        endQuiz.on('child_added',function(snapshot){
+        q=snapshot.child("Quiz").val();
+        alert(q);
+        if(q=="True")
+          document.getElementById("displayStats").disabled=false;
+      });
+  var o1,o2,o3,o4,q,ans;
+  var i=1;
+  var nextQuest = firebase.database().ref("Teacher/");
+       //firebase.database().ref("Teacher/Question "+countVC+"/").once('value').then(function(snapshot) {
+        nextQuest.on('child_added',function(snapshot){
+        q=snapshot.child("Question").val();
+        o1=snapshot.child("Option1").val();
+        o2=snapshot.child("Option2").val();
+        o3=snapshot.child("Option3").val();
+        o4=snapshot.child("Option4").val();
+        ans=snapshot.child("CorrectOption").val();
+  $('#ques').append("<tr><td colspan=5>Question "+i+"</td></tr><tr><td colspan=5>"+q+"</td></tr><tr><td>Option 1</td><td>Option 2</td><td>Option 3</td><td>Option 4</td></tr><tr><td>"+o1+"</td><td>"+o2+"</td><td>"+o3+"</td><td>"+o4+"</td></tr><tr><td><input type=radio name=\"answer"+i+"\" value=\"A\" ></td> <td><input type=radio name=\"answer"+i+"\" value=\"B\"></td><td><input type=radio name=\"answer"+i+"\" value=\"C\"></td><td><input type=radio name=\answer"+i+"\" value=\"D\"></td></tr><tr><td colspan=5><button class=\"ui red primary button\" id=send"+i+" onclick=getResult(\"answer"+i+"\",\""+ans+"\",\""+i+"\")>Submit</button></td></tr><tr><td colspan=5></td></td>");
+    
+    i++;
+  }, function (error) {
+    console.log("Error: " + error.code);
+      
+    });
+        var disableBut = firebase.database().ref(name+"/");
+  function signout()
+    {
+        firebase.auth().signOut().then(function() {
+        var playersRef = firebase.database().ref("SignedIn/");
+        playersRef.child(name).remove();
+  // Sign-out successful.
+}).catch(function(error) {
+  // An error happened.
+});
+}
+
+    
+        function getResult(a,ans,i)
+        {
+            
+            //alert(a+" "+ans+" "+i);
+            var checkedValue;
+            if(document.querySelector('input[name='+a+']:checked')==null)
+            {
+              alert("Please Enter a value");
+            }
+            //alert(checkedValue);
+            else{
+              var correct;
+              var wrong;
+              var button=document.getElementById("send"+i);
+              button.disabled=true;
+             // var curCount = firebase.database().ref("Students/"+name+"/");
+              firebase.database().ref("Students/"+name+"/").once('value').then(function(snapshot) {
+              //curCount.on('value',function(snapshot){
+                  correct=snapshot.child("Correct").val();
+                  wrong=snapshot.child("Wrong").val();
+            checkedValue =document.querySelector('input[name='+a+']:checked').value
+            var displayMessage=document.getElementById("mess");
+            var yourAnswer=document.getElementById("your");
+            var correctAnswer=document.getElementById("correct");
+            yourAnswer.innerText=checkedValue;
+            correctAnswer.innerText=ans;
+            var reply;
+            if(checkedValue==ans)
+            {
+                displayMessage.innerText="ANSWER CORRECT";
+                reply="Correct";
+                $('.ui.modal').modal('show');
+                correct++;
+            }
+            else
+            {
+                reply="Incorrect";
+                displayMessage.innerText="ANSWER INCORRECT";
+                $('.ui.modal').modal('show'); 
+                wrong++;
+            }
+            var questPut = firebase.database().ref("Replies/"+reply+"/Question "+i+"-"+name+" /");
+            questPut.set({
+            Question: "Question "+i,
+            Name: name,
+            Answer : checkedValue,
+        });
+            var ansPut = firebase.database().ref("Students/"+name+"/");
+            ansPut.set({
+            Name: name,
+            Correct : correct,
+            Wrong : wrong,
+        });
+            var ansPut1 = firebase.database().ref("Answers/"+name+"/Question"+i+"/");
+            ansPut1.set({
+            No: "Question "+i,
+            Stat : reply,
+        });
+          
+              firebase.database().ref("Teacher/TotalQuestions/").once('value').then(function(snapshot) {
+                  var total=snapshot.child("Number").val();
+                  var per=correct/total;
+                  per=per*100;
+                  alert(correct);
+
+           $('#prog').progress({
+                  percent: per
+                }); 
+                var score=document.getElementById("score");
+              score.innerText=correct+"/"+total;
+
+                  });
+
+              
+
+            });
+        }
+}
+</script>
+<body>
+  <div class="ui fixed primary inverted menu">
+  <a class="active item">
+    Home
+  </a>
+  <a class="item">  
+    Messages
+  </a>
+  <div class="right menu"><button class="ui large black submit button" onclick="signout()" id="signout">Sign Out</button></div>
+</div>                  
+<div class="ui one column inverted padded centered grid">
+                    <div class="ui centered column ">
+                        <div class="ui container">
+                                    <h1 class="ui inverted header" >Welcome</h1>
+                                    <h2 class="ui inverted header">A place you call home</h2>
+                                    <h3 class="ui inverted header">
+                                    <i class="users icon"></i>
+                                    Your Dashboard </h3>
+                                    <div class="ui divider"></div>
+                                    <div class="raised content">
+                                        This is your own home page. From here you can manage your orders.
+                                    </div>
+                                </div>
+                    </div>
+                    <div class="ui centered column">
+                      <div class="ui grid">
+                        <div class="three wide column">
+                          <div class="ui vertical fluid tabular inverted menu">
+                            <a class="item">
+                              Take Quiz
+                            </a>
+                            <a class="item" href="updateName.html">
+                              Update Profile
+                            </a>
+                            <button class="ui primary green button" id="displayStats" onclick="window.location='userStat.html'" disabled="true">
+                              Statistics
+                            </button>
+                          </div>
+                        </div>
+                        <div class="twelve wide stretched column">
+                          <div class="ui inverted segment">
+                            <table class="ui celled inverted table">
+                              <!--<thead>
+                              
+                              <tr>
+                                <th colspan="5" class="fluid">Questions</th>
+                                
+                              </tr>
+                                  <tr>
+                                <th>Option 1</th>
+                                <th>Option 2</th>
+                                <th>Option 3</th>
+                                <th>Option 4</th>
+                              </tr>
+                              </thead> -->
+                              <tbody id="ques">
+                                
+                                  
+                              </tbody>
+                              <tfoot>
+                                <tr>
+
+                                <input type="hidden" id="count" value="1" />
+                              </tr>
+                              <tr>
+                                <div class="ui teal progress" id="prog">
+                                  <div class="bar"></div>
+                                  <div class="label">Performance</div>
+                                </div>
+                              </tr>
+                              <tr>
+                                PROGRESS : <p id="score"></p>
+                              </tr>
+                              </tfoot>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                  <div class="ui small modal correct">
+  <i class="close icon"></i>
+  <div class="header" id="mess">
+    <i class="checkmark icon"></i>
+  </div>
+  <div class="header">
+    Your Answer : 
+  </div>
+  <div id="your" class="header">
+    
+  </div>
+  <div class="header">
+    Correct Answer :
+  </div>  
+  <div id="correct" class="header">
+    
+  </div>
+  <div class="actions">
+    <div class="ui positive labeled icon button">
+      Continue
+      <i class="checkmark icon"></i>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

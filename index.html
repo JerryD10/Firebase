@@ -1,0 +1,101 @@
+<html>
+<head><title>Test</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+<link rel="stylesheet" type="text/css" href="dialog-polyfill.css" />
+<script src="dialog-polyfill.js"></script>
+<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+<style>
+.demo-layout-transparent {
+  background: url('transparent.jpg') center / cover;
+}
+.demo-layout-transparent .mdl-layout__header,
+.demo-layout-transparent .mdl-layout__drawer-button {
+  /* This background is dark, so we set text to white. Use 87% black instead if
+     your background is light. */
+  color: white;
+}
+</style>
+</head>
+<body>
+<div class="login-cover">
+	
+</div>
+<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+<script src="index.js"></script>
+<dialog id="diag" class="mdl-dialog">
+    <h4 class="mdl-dialog__title">Allow data collection?</h4>
+    <div class="mdl-dialog__content">
+      <p>
+        Allowing us to collect data will let us get you the information you want faster.
+      </p>
+    </div>
+    <div class="mdl-dialog__actions">
+      <button type="button" class="mdl-button">Agree</button>
+      <button type="button" class="mdl-button close">Disagree</button>
+    </div>
+  </dialog>
+<!-- Uses a transparent header that draws on top of the layout's background -->
+
+<div class="demo-layout-transparent mdl-layout mdl-js-layout">
+  <header class="mdl-layout__header mdl-layout__header--transparent">
+    <div class="mdl-layout__header-row">
+      <!-- Title -->
+      <span class="mdl-layout-title">Login</span>
+      <!-- Add spacer, to align navigation to the right -->
+      <div class="mdl-layout-spacer"></div>
+      <!-- Navigation -->
+      <nav class="mdl-navigation">
+        <a class="mdl-navigation__link" href="">Link</a>
+        <a class="mdl-navigation__link" href="">Link</a>
+        <button onclick="send()"></button>
+      </nav>
+    </div>
+  </header>
+  <div class="mdl-layout__drawer">
+    <span class="mdl-layout-title">Title</span>
+    <nav class="mdl-navigation">
+      <a class="mdl-navigation__link" href="">Link</a>
+      <a class="mdl-navigation__link" href="">Link</a>
+      <a class="mdl-navigation__link" href="">Link</a>
+      <a class="mdl-navigation__link" href="">Link</a>
+    </nav>
+  </div>
+  <main class="mdl-layout__content">
+  </main>
+<p id="tabledata">
+</p>
+<script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
+
+<script>
+  var config = {
+    apiKey: "AIzaSyAxDQduCgxzyJT4WyOtc_X3hlfE3cBrKJQ",
+    authDomain: "proj-5e1f9.firebaseapp.com",
+    databaseURL: "https://proj-5e1f9.firebaseio.com",
+    projectId: "proj-5e1f9",
+    storageBucket: "proj-5e1f9.appspot.com",
+    messagingSenderId: "274759144736"
+  };
+  firebase.initializeApp(config);
+</script>
+<script src="in.js">
+</script>
+<script type="text/javascript">
+	
+	function send()
+	{
+		var name=document.getElementById("name");
+		var tb=document.getElementById("tabledata");
+		var firebaseRef=firebase.database().ref();
+		firebaseRef.push().set(name);
+		firebaseRef.on('value', function(snapshot) {
+  		var n=snapshot.child("Name").val();
+  		document.getElementById("tabledata").innerHTML =n;
+	}
+</script>
+</body>
+</html>
+
+
+  

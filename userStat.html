@@ -1,0 +1,172 @@
+<html>
+<head>
+  <title>Login</title>
+  <link rel="stylesheet" type="text/css" href="bower_components/semantic/dist/semantic.min.css">
+  <script src="https://www.gstatic.com/firebasejs/3.8.0/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyCA2vafJnG6jkQBHId5ygBCvWGaFqhglDQ",
+    authDomain: "npltest-aef23.firebaseapp.com",
+    databaseURL: "https://npltest-aef23.firebaseio.com",
+    projectId: "npltest-aef23",
+    storageBucket: "npltest-aef23.appspot.com",
+    messagingSenderId: "475823687563"
+  };
+  firebase.initializeApp(config);
+</script>
+  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <!--<script src="./bower_components/semantic/dist/semantic.min.js"></script>-->
+    <script src="bower_components/semantic/dist/semantic.min.js"></script>
+    <script>
+        $(document).ready(function () {
+                    // create sidebar and attach to menu open
+                    $('.ui.sidebar').sidebar('setting', 'transition', 'overlay').sidebar('attach events', '.toc.item');
+                   $('.menu .item').tab();  
+                });
+        
+    </script>
+    <style type="text/css">
+      body {
+        background-color: black;
+      }
+    body > .grid {
+      height: 100%;
+    }
+    .image {
+      margin-top: -100px;
+    }
+    
+    </style>
+</head>
+<body>
+
+<script type="text/javascript"> 
+  var database = firebase.database();
+  var name;
+  var email;
+  firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    // User is signed in.
+    var user = firebase.auth().currentUser;
+    name = user.displayName;
+    email=user.email;
+     } else {
+    // No user is signed in.
+    window.location="main.html";
+  }
+});
+  var nextQuest = firebase.database().ref("Answers/"+name+"/");
+        nextQuest.on('child_added',function(snapshot){
+        var no=snapshot.child("No").val();
+        var stat=snapshot.child("Stat").val();
+  $('#replies').append("<tr><td>"+no+"</td><td>"+stat+"</td></tr>");
+  }, function (error) {
+    console.log("Error: " + error.code);
+      
+    });
+        
+      
+        
+
+        function view(clicked)
+         {
+          var but=document.getElementById(clicked);
+          firebase.database().ref("Students/"+clicked+"/").once('value').then(function(snapshot) {
+
+            var correct=snapshot.child("Correct").val();
+        var name=snapshot.child("Name").val();
+        var wrong=snapshot.child("Wrong").val();
+        
+        var per=correct/(correct+wrong);
+                  per=per*100;
+                  alert(per);
+            $("#"+clicked).progress({
+                  percent: per
+                });
+          });
+         }
+  firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    // User is signed in.
+  } else {
+    // No user is signed in.
+    window.location="main.html";
+  }
+});
+  
+  function signout()
+  {
+      firebase.auth().signOut().then(function() {
+  // Sign-out successful.
+}).catch(function(error) {
+  // An error happened.
+});
+  }
+</script>
+  <div class="ui fixed primary inverted menu">
+  <a class="active item">
+    Home
+  </a>
+  <a class="item">  
+    Messages
+  </a>
+  <div class="right menu"><button class="ui large black submit button" onclick="signout()" id="signout">Sign Out</button></div>
+</div>                  
+<div class="ui one column inverted padded centered grid">
+                    <div class="ui centered column ">
+                        <div class="ui container">
+                                    <h1 class="ui inverted header" >Welcome</h1>
+                                    <h2 class="ui inverted header">A place you call home</h2>
+                                    <h3 class="ui inverted header">
+                                    <i class="users icon"></i>
+                                    Your Dashboard </h3>
+                                    <div class="ui divider"></div>
+                                    <div class="raised content">
+                                        This is your own home page. From here you can manage your orders.
+                                    </div>
+                                </div>
+                    </div>
+                    <div class="ui centered column">
+                      <div class="ui grid">
+                        <div class="three wide column">
+                          <div class="ui vertical fluid tabular inverted menu">
+                            <a class="item">
+                              Take Quiz
+                            </a>
+                            <a class="item" href="updateName.html">
+                              Update Profile
+                            </a>
+                          </div>
+                        </div>
+                        <div class="twelve wide stretched column">
+                          <div class="ui inverted segment">
+                            <table class="ui celled inverted table">
+                              <thead>
+                              <th colspan="2">
+                                  Answers
+                                </td>
+                                </th>
+                              </thead>
+                              <tr>
+                                <td>
+                                Question
+                                </td>
+                                <td>
+                                  Response
+                                </td>
+                              </tr>
+                              <tbody id="replies">
+                                
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                        
+                      </div>
+
+                    </div>
+                  </div>
+
+</body>
+</html>
